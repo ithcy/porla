@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include <boost/program_options.hpp>
 #include <libtorrent/extensions.hpp>
@@ -54,6 +55,7 @@ namespace porla
         std::optional<bool>                      plugins_allow_git;
         std::optional<fs::path>                  plugins_install_dir;
         std::map<std::string, Preset>            presets;
+        std::vector<std::string>                 preset_order;
         std::string                              secret_key;
         std::map<std::string, lt::settings_pack> sessions;
         std::optional<int>                       sodium_memlimit;
@@ -63,6 +65,7 @@ namespace porla
         std::optional<int>                       timer_session_stats;
         std::optional<int>                       timer_torrent_updates;
         std::optional<std::string>               webui_default_add_torrent_tab;
+        std::optional<bool>                      webui_sort_presets_alphabetically;
         std::optional<fs::path>                  workflow_dir;
 
         static std::unique_ptr<Config> Load(const boost::program_options::variables_map& cmd);
