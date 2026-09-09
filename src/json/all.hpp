@@ -33,4 +33,5 @@
 #include "torrentsresume.hpp"
 #include "torrentspropertiesset.hpp"
 #include "torrentstrackerslist.hpp"
+#include "webuiconfig.hpp"
 #include "webuiinstall.hpp"

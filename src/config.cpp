@@ -242,6 +242,9 @@ std::unique_ptr<Config> Config::Load(const boost::program_options::variables_map
             if (auto val = config_file_tbl["http"]["webui_repository"].value<std::string>())
                 cfg->http_webui_repository = *val;
 
+            if (auto val = config_file_tbl["webui"]["default_add_torrent_tab"].value<std::string>())
+                cfg->webui_default_add_torrent_tab = *val;
+
             // Plugins
             if (auto val = config_file_tbl["plugins"]["allow_git"].value<bool>())
                 cfg->plugins_allow_git = *val;
