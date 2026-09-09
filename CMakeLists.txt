@@ -116,6 +116,7 @@ add_library(
     src/methods/torrentspropertiesset.cpp
     src/methods/torrentstrackerslist.cpp
     src/methods/torrents/torrentsoverview.cpp
+    src/methods/webui/webuiconfig.cpp
     src/methods/webui/webuiinstall.cpp
 
     src/query/_aux/PorlaQueryLangBaseVisitor.cpp

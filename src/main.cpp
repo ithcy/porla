@@ -54,6 +54,7 @@
 #include "methods/torrentspropertiesset.hpp"
 #include "methods/torrentstrackerslist.hpp"
 #include "methods/torrents/torrentsoverview.hpp"
+#include "methods/webui/webuiconfig.hpp"
 #include "methods/webui/webuiinstall.hpp"
 
 int main(int argc, char* argv[])
@@ -199,6 +200,7 @@ int main(int argc, char* argv[])
             {"torrents.remove", porla::Methods::TorrentsRemove(sessions)},
             {"torrents.resume", porla::Methods::TorrentsResume(sessions)},
             {"torrents.trackers.list", porla::Methods::TorrentsTrackersList(sessions)},
+            {"webui.config", porla::Methods::WebUI::WebUIConfig(*cfg)},
             {"webui.install", porla::Methods::WebUI::WebUIInstall(*cfg, webui_installed_signal)}
         });
 
