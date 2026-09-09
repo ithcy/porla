@@ -99,6 +99,7 @@ add_library(
     src/methods/sessions/sessionspause.cpp
     src/methods/sessions/sessionsresume.cpp
     src/methods/sessions/sessionssettingslist.cpp
+    src/methods/sessions/sessionssettingsupdate.cpp
     src/methods/presetsexport.cpp
     src/methods/presetslist.cpp
     src/methods/sysversions.cpp
