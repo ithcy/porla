@@ -33,6 +33,7 @@
 #include "methods/plugins/pluginsreload.hpp"
 #include "methods/plugins/pluginsuninstall.hpp"
 #include "methods/plugins/pluginsupdate.hpp"
+#include "methods/presetsexport.hpp"
 #include "methods/presetslist.hpp"
 #include "methods/sessions/sessionslist.hpp"
 #include "methods/sessions/sessionspause.hpp"
@@ -179,6 +180,7 @@ int main(int argc, char* argv[])
             {"plugins.reload", porla::Methods::PluginsReload(plugin_engine)},
             {"plugins.uninstall", porla::Methods::PluginsUninstall(plugin_engine)},
             {"plugins.update", porla::Methods::PluginsUpdate(plugins_update_options)},
+            {"presets.export", porla::Methods::PresetsExport(*cfg)},
             {"presets.list", porla::Methods::PresetsList(*cfg)},
             {"sessions.list", porla::Methods::SessionsList(sessions)},
             {"sessions.pause", porla::Methods::SessionsPause(sessions)},
