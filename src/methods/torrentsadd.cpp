@@ -13,6 +13,26 @@ namespace lt = libtorrent;
 using porla::Methods::TorrentsAdd;
 using porla::Methods::TorrentsAddReq;
 
+static std::optional<std::string> FindDefaultPresetName(const std::map<std::string, porla::Config::Preset>& presets)
+{
+    for (auto const& [name, preset] : presets)
+    {
+        if (preset.is_default.value_or(false))
+        {
+            return name;
+        }
+    }
+
+    // Backwards compat: a preset literally named 'default' is the default
+    // if none is explicitly marked with `default = true`.
+    if (presets.find("default") != presets.end())
+    {
+        return "default";
+    }
+
+    return std::nullopt;
+}
+
 static void ApplyPreset(lt::add_torrent_params& p, const porla::Config::Preset& preset)
 {
     if (preset.download_limit.has_value())  p.download_limit  = preset.download_limit.value();
@@ -38,15 +58,17 @@ TorrentsAdd::TorrentsAdd(Sessions& sessions, const std::map<std::string, Config:
 
 void TorrentsAdd::Invoke(const TorrentsAddReq& req, WriteCb<TorrentsAddRes> cb)
 {
+    const auto default_preset_name = FindDefaultPresetName(m_presets);
+
     const auto& state = req.preset.has_value()
         ? m_presets.find(req.preset.value()) != m_presets.end()
             ? m_presets.at(req.preset.value()).session.has_value()
                 ? m_sessions.Get(m_presets.at(req.preset.value()).session.value())
                 : m_sessions.Default()
             : m_sessions.Default()
-        : m_presets.find("default") != m_presets.end()
-            ? m_presets.at("default").session.has_value()
-                ? m_sessions.Get(m_presets.at("default").session.value())
+        : default_preset_name.has_value()
+            ? m_presets.at(default_preset_name.value()).session.has_value()
+                ? m_sessions.Get(m_presets.at(default_preset_name.value()).session.value())
                 : m_sessions.Default()
             : m_sessions.Default();
 
@@ -59,11 +81,11 @@ void TorrentsAdd::Invoke(const TorrentsAddReq& req, WriteCb<TorrentsAddRes> cb)
     p.userdata = lt::client_data_t(new TorrentClientData());
     p.userdata.get<TorrentClientData>()->state = state;
 
-    // Apply the 'default' preset if it exists
-    if (m_presets.find("default") != m_presets.end())
+    // Apply the default preset if one exists
+    if (default_preset_name.has_value())
     {
-        BOOST_LOG_TRIVIAL(debug) << "Applying default preset";
-        ApplyPreset(p, m_presets.at("default"));
+        BOOST_LOG_TRIVIAL(debug) << "Applying default preset '" << default_preset_name.value() << "'";
+        ApplyPreset(p, m_presets.at(default_preset_name.value()));
     }
 
     if (req.preset.has_value() && !req.preset.value().empty())
@@ -75,8 +97,8 @@ void TorrentsAdd::Invoke(const TorrentsAddReq& req, WriteCb<TorrentsAddRes> cb)
         {
             BOOST_LOG_TRIVIAL(warning) << "Specified preset '" << preset_name << "' not found.";
         }
-        // Only apply presets other than default here, since default is applied above..
-        else if (preset_name != "default")
+        // Only apply presets other than the default here, since the default is applied above.
+        else if (preset_name != default_preset_name)
         {
             BOOST_LOG_TRIVIAL(debug) << "Applying preset " << preset_name;
             ApplyPreset(p, preset->second);
