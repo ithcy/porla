@@ -12,6 +12,7 @@
 #include "pluginsreload.hpp"
 #include "pluginsuninstall.hpp"
 #include "pluginsupdate.hpp"
+#include "presetsexport.hpp"
 #include "presetslist.hpp"
 #include "sessionslist.hpp"
 #include "sessionspause.hpp"
