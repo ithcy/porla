@@ -54,7 +54,9 @@ add_library(
     src/data/migrations/0007_removesessionsettings.cpp
     src/data/migrations/0008_plugins.cpp
     src/data/migrations/0009_multisessions.cpp
+    src/data/migrations/0010_apikeys.cpp
     src/data/models/addtorrentparams.cpp
+    src/data/models/apikeys.cpp
     src/data/models/users.cpp
     src/data/statement.cpp
 
@@ -122,6 +124,7 @@ add_library(
     src/query/_aux/PorlaQueryLangVisitor.cpp
     src/query/pql.cpp
 
+    src/tools/apikey.cpp
     src/tools/authtoken.cpp
     src/tools/generatesecretkey.cpp
     src/tools/versionjson.cpp

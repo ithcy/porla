@@ -4,13 +4,18 @@
 #include <jwt-cpp/traits/nlohmann-json/defaults.h>
 #include <jwt-cpp/jwt.h>
 
+#include "../data/models/apikeys.hpp"
 #include "../utils/string.hpp"
 
+using porla::Data::Models::ApiKeys;
 using porla::Http::JwtHandler;
 using porla::Utils::String;
 
-JwtHandler::JwtHandler(const std::string &secret_key, Handler next)
-    : m_secret_key(secret_key)
+static const std::string ApiKeyPrefix = "porla_";
+
+JwtHandler::JwtHandler(sqlite3* db, const std::string &secret_key, Handler next)
+    : m_db(db)
+    , m_secret_key(secret_key)
     , m_next(next)
 {
 }
@@ -85,6 +90,19 @@ void JwtHandler::operator()(uWS::HttpResponse<false> *res, uWS::HttpRequest *req
 
     if (!bearer_token.has_value())
     {
+        return res->writeStatus("401 Unauthorized")->end("Unauthorized");
+    }
+
+    if (bearer_token->starts_with(ApiKeyPrefix))
+    {
+        const auto key = ApiKeys::GetByTokenHash(m_db, ApiKeys::HashToken(bearer_token.value()));
+
+        if (key.has_value())
+        {
+            ApiKeys::TouchLastUsed(m_db, key->id);
+            return m_next(res, req);
+        }
+
         return res->writeStatus("401 Unauthorized")->end("Unauthorized");
     }
 
