@@ -1,5 +1,7 @@
 #include "config.hpp"
 
+#include <algorithm>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -245,6 +247,9 @@ std::unique_ptr<Config> Config::Load(const boost::program_options::variables_map
             if (auto val = config_file_tbl["webui"]["default_add_torrent_tab"].value<std::string>())
                 cfg->webui_default_add_torrent_tab = *val;
 
+            if (auto val = config_file_tbl["webui"]["sort_presets_alphabetically"].value<bool>())
+                cfg->webui_sort_presets_alphabetically = *val;
+
             // Plugins
             if (auto val = config_file_tbl["plugins"]["allow_git"].value<bool>())
                 cfg->plugins_allow_git = *val;
@@ -255,6 +260,12 @@ std::unique_ptr<Config> Config::Load(const boost::program_options::variables_map
             // Load presets
             if (auto const* presets_tbl = config_file_tbl["presets"].as_table())
             {
+                // toml++ stores a table built up from multiple separate
+                // [presets.x] headers key-sorted, not in file order, so
+                // declaration order has to be recovered from each preset
+                // table's source position instead of iteration order.
+                std::vector<std::pair<std::string, std::uint32_t>> preset_lines;
+
                 for (auto const [key,value] : *presets_tbl)
                 {
                     if (!value.is_table())
@@ -311,8 +322,17 @@ std::unique_ptr<Config> Config::Load(const boost::program_options::variables_map
                     if (auto val = value_tbl["default"].value<bool>())
                         p.is_default = *val;
 
+                    preset_lines.emplace_back(key.data(), value.source().begin.line);
                     cfg->presets.insert({ key.data(), std::move(p) });
                 }
+
+                std::sort(
+                    preset_lines.begin(),
+                    preset_lines.end(),
+                    [](auto const& a, auto const& b) { return a.second < b.second; });
+
+                for (auto const& [name, line] : preset_lines)
+                    cfg->preset_order.emplace_back(name);
 
                 int default_preset_count = 0;
                 for (auto const& [name, preset] : cfg->presets)

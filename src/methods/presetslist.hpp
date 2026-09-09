@@ -9,12 +9,12 @@ namespace porla::Methods
     class PresetsList : public Method<PresetsListReq, PresetsListRes>
     {
     public:
-        explicit PresetsList(const std::map<std::string, Config::Preset>& presets);
+        explicit PresetsList(const porla::Config& cfg);
 
     protected:
         void Invoke(const PresetsListReq& req, WriteCb<PresetsListRes> cb) override;
 
     private:
-        const std::map<std::string, Config::Preset>& m_presets;
+        const porla::Config& m_cfg;
     };
 }

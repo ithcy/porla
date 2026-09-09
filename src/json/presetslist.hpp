@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include <nlohmann/json.hpp>
 
 #include "utils.hpp"
@@ -31,6 +33,18 @@ namespace porla::Methods
             // porla specific
             j[key]["$hidden"]         = preset.dollar_hidden   ? json(preset.dollar_hidden.value())   : json();
             j[key]["$default"]        = preset.is_default      ? json(preset.is_default.value())      : json();
+
+            if (res.sort_alphabetically)
+            {
+                j[key]["$order"] = json();
+            }
+            else
+            {
+                auto const it = std::find(res.order.begin(), res.order.end(), key);
+                j[key]["$order"] = it != res.order.end()
+                    ? json(static_cast<int>(std::distance(res.order.begin(), it)))
+                    : json();
+            }
         }
     }
 }

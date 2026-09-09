@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
             {"plugins.reload", porla::Methods::PluginsReload(plugin_engine)},
             {"plugins.uninstall", porla::Methods::PluginsUninstall(plugin_engine)},
             {"plugins.update", porla::Methods::PluginsUpdate(plugins_update_options)},
-            {"presets.list", porla::Methods::PresetsList(cfg->presets)},
+            {"presets.list", porla::Methods::PresetsList(*cfg)},
             {"sessions.list", porla::Methods::SessionsList(sessions)},
             {"sessions.pause", porla::Methods::SessionsPause(sessions)},
             {"sessions.resume", porla::Methods::SessionsResume(sessions)},
