@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM ghcr.io/porla/alpine:3.22.0 AS base
 
 FROM base AS build-base
@@ -101,7 +102,8 @@ RUN apk add --no-cache \
     sqlite-dev \
     sqlite-static
 
-RUN cmake -S . -B build -G Ninja \
+RUN --mount=type=cache,target=/src/build \
+    cmake -S . -B build -G Ninja \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_EXE_LINKER_FLAGS="-static -Os" \
@@ -114,7 +116,8 @@ RUN cmake -S . -B build -G Ninja \
     -DENABLE_BZIP2=OFF \
     -DENABLE_LZMA=OFF
 
-RUN cmake --build build
+RUN --mount=type=cache,target=/src/build \
+    cmake --build build && cp build/porla /porla
 
 # runtime image
 FROM base AS runtime
@@ -123,5 +126,5 @@ ENV PORLA_HTTP_HOST=0.0.0.0
 EXPOSE 1337
 
 WORKDIR /
-COPY --from=build-porla /src/build/porla /usr/bin/porla
+COPY --from=build-porla /porla /usr/bin/porla
 ENTRYPOINT [ "/usr/bin/porla" ]
