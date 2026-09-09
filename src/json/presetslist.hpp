@@ -30,6 +30,7 @@ namespace porla::Methods
 
             // porla specific
             j[key]["$hidden"]         = preset.dollar_hidden   ? json(preset.dollar_hidden.value())   : json();
+            j[key]["$default"]        = preset.is_default      ? json(preset.is_default.value())      : json();
         }
     }
 }

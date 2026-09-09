@@ -308,7 +308,22 @@ std::unique_ptr<Config> Config::Load(const boost::program_options::variables_map
                     if (auto dollar_hidden = value_tbl["$hidden"].value<bool>())
                         p.dollar_hidden = *dollar_hidden;
 
+                    if (auto val = value_tbl["default"].value<bool>())
+                        p.is_default = *val;
+
                     cfg->presets.insert({ key.data(), std::move(p) });
+                }
+
+                int default_preset_count = 0;
+                for (auto const& [name, preset] : cfg->presets)
+                {
+                    if (preset.is_default.value_or(false)) default_preset_count++;
+                }
+
+                if (default_preset_count > 1)
+                {
+                    BOOST_LOG_TRIVIAL(warning) << "Multiple presets have 'default = true' set; "
+                        << "only one preset should be marked as the default";
                 }
             }
 

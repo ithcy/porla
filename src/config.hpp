@@ -36,6 +36,7 @@ namespace porla
 
             // porla specific
             std::optional<bool>                       dollar_hidden;
+            std::optional<bool>                       is_default;
         };
 
         std::optional<std::string>               config_file;
